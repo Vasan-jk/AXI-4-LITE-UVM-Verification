@@ -1,4 +1,4 @@
-class axi_seq_item(input ACLK, ARESETn);
+class axi_seq_item;
 rand bit [`ADDR_WIDTH-1:0]AWADDR;
 rand bit AWVALID;
 rand bit [2:0] AWPROT;
@@ -48,5 +48,4 @@ function new(string name = "axi_seq_item");
   super.new(name);
 endfunction
 
-endclass
 endclass
