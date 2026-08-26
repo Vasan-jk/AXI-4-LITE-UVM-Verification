@@ -25,16 +25,17 @@ task run_phase(uvm_phase phase);
 repeat(6) @(vif.monin_cb);
 tr = axi_seq_item::type_id::create("tr");
 forever begin
-  tr.AWADDR = vif.monin_cb.AWADDR;
-  tr.AWVALID = vif.monin_cb.AWVALID;
-  tr.AWPROT = vif.monin_cb.AWPROT;
-  tr.WDATA = vif.monin_cb.WDATA; 
-  tr.WSTRB = vif.monin_cb.WSTRB;
-  tr.WVALID = vif.monin_cb.WVALID;
-  tr.BREADY = vif.monin_cb.BREADY; 
-  tr.ARADDR = vif.monin_cb.ARADDR; 
-  tr.ARVALID = vif.monin_cb.ARVALID; 
-  tr.RREADY = vif.monin_cb.RREADY;
+  if(vif.monin_cb.AWVALID && vif.monin_cb.AWREADY) begin
+    tr.AWPROT = vif.monin_cb.AWPROT;
+    tr.AWADDR = vif.monin_cb.AWADDR;
+  end
+  if(vif.monin_cb.WVALID && vif.monin_cb.WREADY) begin  
+    tr.WDATA = vif.monin_cb.WDATA; 
+    tr.WSTRB = vif.monin_cb.WSTRB;
+  end
+  if(vif.monin_cb.ARVALID && vif.monin_cb.ARREADY) begin
+    tr.ARADDR = vif.monin_cb.ARADDR;
+  end
   `uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR\n%s",tr.sprint()),UVM_HIGH)
   in_port.write(tr); 
 end

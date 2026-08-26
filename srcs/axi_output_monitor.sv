@@ -25,14 +25,12 @@ task run_phase(uvm_phase phase);
 repeat(6) @(vif.monout_cb);
 tr = axi_seq_item::type_id::create("tr");
 forever begin
- tr.AWREADY = vif.monout_cb.AWREADY;
- tr.WREADY = vif.monout_cb.WREADY;
- tr.BRESP = vif.monout_cb.BRESP; 
- tr.BVALID = vif.monout_cb.BVALID;
- tr.ARREADY = vif.monout_cb.ARREADY;
- tr.RDATA = vif.monout_cb.RDATA; 
- tr.RRESP = vif.monout_cb.RRESP; 
- tr.RVALID = vif.monout_cb.RVALID;
+ if(vif.monout_cb.BVALID && vif.monout_cb.BREADY) begin
+  tr.BRESP = vif.monout_cb.BRESP; 
+ if(vif.monout_cb.RVALID && vif.monout_cb.RREADY) begin
+  tr.RDATA = vif.monout_cb.RDATA; 
+  tr.RRESP = vif.monout_cb.RRESP; 
+ end
   `uvm_info("OUTPUT_MONITOR",$sformatf("Output MONITOR\n%s",tr.sprint()),UVM_HIGH)
   out_port.write(tr); 
 end
