@@ -1,4 +1,4 @@
-class axi_seq_item;
+class axi_seq_item extends uvm_sequence_item;
 rand bit [`ADDR_WIDTH-1:0]AWADDR;
 rand bit AWVALID;
 rand bit [2:0] AWPROT;
@@ -22,6 +22,8 @@ rand bit RREADY;
 bit RDATA;
 bit RRESP;
 bit RVALID;
+
+rand bit [1:0] wrsel;
 `uvm_object_utils_begin(axi_seq_item)
 `uvm_field_int(AWADDR, UVM_ALL_ON)
 `uvm_field_int(AWVALID, UVM_ALL_ON)

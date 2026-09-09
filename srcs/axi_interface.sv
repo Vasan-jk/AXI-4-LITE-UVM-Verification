@@ -1,3 +1,4 @@
+`include "defines.svh"
 interface axi_interface(input ACLK, ARESETn);
 logic [`ADDR_WIDTH-1:0]AWADDR;
 logic AWVALID;
@@ -23,21 +24,21 @@ logic RDATA;
 logic RRESP;
 logic RVALID;
 
-clocking drv_cb(@posedge ACLK);
+clocking drv_cb@(posedge ACLK);
 default input #1 output #0;
 input AWREADY, WREADY, BRESP, BVALID, ARREADY, RDATA, RRESP, RVALID;
 output AWADDR, AWVALID, AWPROT, WDATA, WSTRB, WVALID, BREADY, ARADDR, ARVALID, RREADY; 
-endinterface
+endclocking
 
-clocking monin_cb(@posedge ACLK);
+clocking monin_cb@(posedge ACLK);
 default input #1 output #0;
 input AWADDR, AWVALID, AWPROT, WDATA, WSTRB, WVALID, BREADY, ARADDR, ARVALID, RREADY; 
-endinterface
+endclocking
 
-clocking monout_cb(@posedge ACLK);
+clocking monout_cb@(posedge ACLK);
 default input #1 output #0;
 input AWREADY, WREADY, BRESP, BVALID, ARREADY, RDATA, RRESP, RVALID;
-endinterface
+endclocking
 
 modport drv(clocking drv_cb);
 modport monin(clocking monin_cb);
