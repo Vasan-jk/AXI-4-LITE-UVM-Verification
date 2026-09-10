@@ -27,7 +27,7 @@ task body();
   repeat(`num_of_transaction) begin
   req = axi_seq_item::type_id::create("req");
     start_item(req);
-    assert(req.randomize() with {WADDR == 0; AWVALID == 1; WDATA == 100; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
+    assert(req.randomize() with {AWADDR == 0; AWVALID == 1; WDATA == 100; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
     finish_item(req);
   end
 endtask

@@ -15,7 +15,7 @@ function void build_phase(uvm_phase phase);
   a_cfg.input_agent_is_active = UVM_ACTIVE;
   a_cfg.output_agent_is_active = UVM_PASSIVE;
   
-  uvm_config_db#(axi_config)::set(this,"*","a_cfg",a_cfg);
+  uvm_config_db#(axi_config)::set(this,"*","axi_cfg",a_cfg);
   env = axi_environment::type_id::create("env", this);
 endfunction
 
@@ -28,7 +28,8 @@ endclass
 
 class base_test extends test;
 `uvm_component_utils(base_test)
-axi_sequence s;
+base_read br;
+base_write bw;
 
 function new(string name = "base_test", uvm_component parent);
   super.new(name, parent);
@@ -40,8 +41,10 @@ endfunction
 
 task run_phase(uvm_phase phase);
   phase.raise_objection(this);
-  s=axi_sequence::type_id::create("s");
-  s.start(env_h.inp_agt_h.seq);
+  bw = base_write::type_id::create("s");
+  bw.start(env.inp_agnt.wrsqr);
+  br = base_read::type_id::create("r");
+  br.start(env.inp_agnt.rdsqr);
   #40; 
   phase.drop_objection(this);
  endtask

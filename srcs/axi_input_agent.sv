@@ -1,6 +1,7 @@
 class axi_input_agent extends uvm_agent;
 `uvm_component_utils(axi_input_agent)
-axi_sequencer sqr;
+axi_sequencer rdsqr;
+axi_sequencer wrsqr;
 axi_master_driver drv;
 axi_input_monitor inmon;
 axi_config a_cfg;
@@ -15,15 +16,17 @@ function void build_phase(uvm_phase phase);
    end
   inmon = axi_input_monitor::type_id::create("inmon", this);
   if(a_cfg.input_agent_is_active == UVM_ACTIVE) begin
-    sqr = axi_sequencer::type_id::create("sqr",this);
+    rdsqr = axi_sequencer::type_id::create("rdsqr",this);
+    wrsqr = axi_sequencer::type_id::create("wrsqr",this);
     drv = axi_master_driver::type_id::create("drv", this);
+    inmon = axi_input_monitor::type_id::create("inmon", this);
   end
 endfunction
 
 function void connect_phase(uvm_phase phase);
   if(a_cfg.input_agent_is_active == UVM_ACTIVE) begin
-    this.drv.seq_item_port.connect(this.sqr.seq_item_export);
-    this.drv.seq_item_port.connect(this.sqr.seq_item_export);
+    this.drv.seq_item_port.connect(this.rdsqr.seq_item_export);
+    this.drv.seq_item_port.connect(this.wrsqr.seq_item_export);
   end
 endfunction
 
