@@ -1,18 +1,18 @@
 class axi_master_driver extends uvm_driver#(axi_seq_item);
-`uvm_component_utils(axi_driver)
+`uvm_component_utils(axi_master_driver)
 axi_seq_item trr,trw;
 axi_config a_cfg;
 virtual axi_interface.drv vif;
-uvm_seq_item_pull_port #(axi_item) rep;
+uvm_seq_item_pull_port #(axi_seq_item) rep;
 
 function new(string name = "axi_driver", uvm_component parent);
   super.new(name, parent);
-  rep = new("this", rep);
+  rep = new("rep",this);
 endfunction
 
 function void build_phase(uvm_phase phase);
   super.build_phase(phase);
-  if(!(uvm_config_db#(axi_config)::get(this,"","axi_cfg","a_cfg")))
+  if(!(uvm_config_db#(axi_config)::get(this,"","axi_cfg",a_cfg)))
     `uvm_fatal(get_full_name(),"DRIVER CONFIG NOT CONNECTED")
 endfunction
 
@@ -22,7 +22,7 @@ function void connect_phase(uvm_phase phase);
 endfunction
 
 task run_phase(uvm_phase phase);
-  repeat(3)@vif.drv_cb.ACLK;
+  repeat(3)@(vif.drv_cb);
   fork
     write_op();
     read_op();
@@ -57,7 +57,7 @@ task wr_addr(axi_seq_item wrar);
   vif.drv_cb.AWPROT <= wrar.AWPROT;
   do
    @(vif.drv_cb); 
-  while(!vif.drv_cb.AWREADY && !vif.drv_cb.AWVALID)
+  while(!vif.drv_cb.AWREADY && !wrar.AWVALID);
     vif.drv_cb.AWVALID <= 0;
 endtask
 task wr_data(axi_seq_item wrdt);
@@ -66,7 +66,7 @@ task wr_data(axi_seq_item wrdt);
   vif.drv_cb.WVALID <= wrdt.WVALID;
   do
    @(vif.drv_cb); 
-  while(!vif.drv_cb.WREADY && !vif.drv_cb.WVALID)
+  while(!vif.drv_cb.WREADY && !wrdt.WVALID);
     vif.drv_cb.WVALID <= 0;
 endtask
 
@@ -78,18 +78,17 @@ endtask
 task rd_addr(axi_seq_item rdar);
   vif.drv_cb.ARADDR <= rdar.ARADDR;
   vif.drv_cb.ARPROT <= rdar.ARPROT;
-  vif.drv_cb.ARVALID <= rdar.ARVAILD; 
+  vif.drv_cb.ARVALID <= rdar.ARVALID; 
   do
    @(vif.drv_cb); 
-  while(!vif.drv_cb.ARREADY && !vif.drv_cb.ARVALID)
+  while(!vif.drv_cb.ARREADY && !rdar.ARVALID);
     vif.drv_cb.ARVALID <= 0;
 endtask
 
 task rd_data(axi_seq_item rddt);
   do
    @(vif.drv_cb); 
-  while(!vif.drv_cb.RREADY && !vif.drv_cb.RVALID)
-    vif.drv_cb.RVALID <= 0;
+  while(!rddt.RREADY && !vif.drv_cb.RVALID);
   vif.drv_cb.RREADY <= rddt.RREADY;
 endtask
 endclass

@@ -16,13 +16,14 @@ function void build_phase(uvm_phase phase);
   inmon = axi_input_monitor::type_id::create("inmon", this);
   if(a_cfg.input_agent_is_active == UVM_ACTIVE) begin
     sqr = axi_sequencer::type_id::create("sqr",this);
-    drv = axi_driver::type_id::create("drv", this);
+    drv = axi_master_driver::type_id::create("drv", this);
   end
 endfunction
 
 function void connect_phase(uvm_phase phase);
   if(a_cfg.input_agent_is_active == UVM_ACTIVE) begin
-    drv.seq_item_port.connect(seq.seq_item_export);
+    this.drv.seq_item_port.connect(this.sqr.seq_item_export);
+    this.drv.seq_item_port.connect(this.sqr.seq_item_export);
   end
 endfunction
 

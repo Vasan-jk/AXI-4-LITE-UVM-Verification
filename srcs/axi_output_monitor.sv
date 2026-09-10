@@ -1,9 +1,9 @@
 class axi_output_monitor extends uvm_monitor;
 `uvm_component_utils(axi_output_monitor)
 axi_config a_cfg;
-axi_interface.monout_cb vif;
-uvm_analysis_port #(seq_item) outrd_port;
-uvm_analysis_port #(seq_item) outwr_port;
+virtual axi_interface.monout vif;
+uvm_analysis_port #(axi_seq_item) outrd_port;
+uvm_analysis_port #(axi_seq_item) outwr_port;
 axi_seq_item wrtr;
 axi_seq_item rdtr;
 
@@ -15,7 +15,7 @@ endfunction
 
 function void build_phase(uvm_phase phase);
   super.build_phase(phase);
-  if(!(uvm_config_db#(axi_config)::get(this,"","axi_cfg","a_cfg")))
+  if(!(uvm_config_db#(axi_config)::get(this,"","axi_cfg",a_cfg)))
     `uvm_fatal("INPUT_MONITOR","INPUT MONITOR NOT CONFIGURED")
 endfunction
 
@@ -29,16 +29,18 @@ repeat(6) @(vif.monout_cb);
 wrtr = axi_seq_item::type_id::create("wrtr");
 rdtr = axi_seq_item::type_id::create("rdtr");
 forever begin
+@(vif.monout_cb);
  if(vif.monout_cb.BVALID && vif.monout_cb.BREADY) begin
-  tr.BRESP = vif.monout_cb.BRESP; 
+  wrtr.BRESP = vif.monout_cb.BRESP; 
+  outwr_port.write(wrtr); 
  end
  
  if(vif.monout_cb.RVALID && vif.monout_cb.RREADY) begin
-  tr.RDATA = vif.monout_cb.RDATA; 
-  tr.RRESP = vif.monout_cb.RRESP; 
+  rdtr.RDATA = vif.monout_cb.RDATA; 
+  rdtr.RRESP = vif.monout_cb.RRESP; 
+  outrd_port.write(rdtr); 
  end
-  `uvm_info("OUTPUT_MONITOR",$sformatf("Output MONITOR\n%s",tr.sprint()),UVM_HIGH)
-  out_port.write(tr); 
+  //`uvm_info("OUTPUT_MONITOR",$sformatf("Output MONITOR\n%s",tr.sprint()),UVM_HIGH)
 end
 endtask
 endclass

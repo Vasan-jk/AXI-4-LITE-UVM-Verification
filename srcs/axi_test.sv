@@ -26,3 +26,24 @@ endfunction
 
 endclass
 
+class base_test extends test;
+`uvm_component_utils(base_test)
+axi_sequence s;
+
+function new(string name = "base_test", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  s=axi_sequence::type_id::create("s");
+  s.start(env_h.inp_agt_h.seq);
+  #40; 
+  phase.drop_objection(this);
+ endtask
+
+endclass

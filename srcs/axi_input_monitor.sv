@@ -1,7 +1,7 @@
 class axi_input_monitor extends uvm_monitor;
 `uvm_component_utils(axi_input_monitor)
 axi_config a_cfg;
-axi_interface.monin_cb vif;
+virtual axi_interface.monin vif;
 uvm_analysis_port #(axi_seq_item) inwr_port;
 uvm_analysis_port #(axi_seq_item) inrd_port;
 axi_seq_item wrtr;
@@ -15,7 +15,7 @@ endfunction
 
 function void build_phase(uvm_phase phase);
   super.build_phase(phase);
-  if(!(uvm_config_db#(axi_config)::get(this,"","axi_cfg","a_cfg")))
+  if(!(uvm_config_db#(axi_config)::get(this,"","axi_cfg",a_cfg)))
     `uvm_fatal("INPUT_MONITOR","INPUT MONITOR NOT CONFIGURED")
 endfunction
 
@@ -29,22 +29,23 @@ repeat(6) @(vif.monin_cb);
 wrtr = axi_seq_item::type_id::create("wrtr");
 rdtr = axi_seq_item::type_id::create("rdtr");
 forever begin
+@(vif.monin_cb);
 fork
   if(vif.monin_cb.AWVALID && vif.monin_cb.AWREADY) begin
-    tr.AWPROT = vif.monin_cb.AWPROT;
-    tr.AWADDR = vif.monin_cb.AWADDR;
+    wrtr.AWPROT = vif.monin_cb.AWPROT;
+    wrtr.AWADDR = vif.monin_cb.AWADDR;
   end
   if(vif.monin_cb.WVALID && vif.monin_cb.WREADY) begin  
-    tr.WDATA = vif.monin_cb.WDATA; 
-    tr.WSTRB = vif.monin_cb.WSTRB;
+    wrtr.WDATA = vif.monin_cb.WDATA; 
+    wrtr.WSTRB = vif.monin_cb.WSTRB;
   end
 join
 inwr_port.write(wrtr);
   if(vif.monin_cb.ARVALID && vif.monin_cb.ARREADY) begin
-    tr.ARADDR = vif.monin_cb.ARADDR;
+    rdtr.ARADDR = vif.monin_cb.ARADDR;
   end
 inrd_port.write(rdtr);
-`uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR\n%s",rdtr.sprint()),UVM_HIGH)
+//`uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR\n%s",rdtr.sprint()),UVM_HIGH)
 end
 endtask
 endclass

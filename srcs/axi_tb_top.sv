@@ -5,8 +5,8 @@
 module axi_tb_top;
 import uvm_pkg::*;
 
-bit clk;
-axi_interface duvif(clk);
+bit clk,rst;
+axi_interface duvif(clk,rst);
 
  axi4_lite_slave #(
         .DATA_WIDTH (32),
@@ -53,7 +53,10 @@ end
 
 initial begin
   clk = 1'b0;
+  rst = 0;
   forever #5 clk = ~clk;
+  #20;
+  rst = 1;
 end
 
 endmodule

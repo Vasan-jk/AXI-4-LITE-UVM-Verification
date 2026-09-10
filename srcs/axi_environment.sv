@@ -1,5 +1,5 @@
-class axi_environment;
-`uvm_component_utils(env)
+class axi_environment extends uvm_env;
+`uvm_component_utils(axi_environment)
 
 axi_input_agent inp_agnt;
 axi_output_agent out_agnt;
