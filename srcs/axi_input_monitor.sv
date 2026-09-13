@@ -41,11 +41,12 @@ fork
   end
 join
 inwr_port.write(wrtr);
+`uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR\n%s",wrtr.sprint()),UVM_NONE)
   if(vif.monin_cb.ARVALID && vif.monin_cb.ARREADY) begin
     rdtr.ARADDR = vif.monin_cb.ARADDR;
   end
 inrd_port.write(rdtr);
-//`uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR\n%s",rdtr.sprint()),UVM_HIGH)
+//`uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR\n%s",rdtr.sprint()),UVM_NONE)
 end
 endtask
 endclass

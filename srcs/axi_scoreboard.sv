@@ -6,8 +6,8 @@ uvm_tlm_analysis_fifo #(axi_seq_item) moninrd_fifo;
 uvm_tlm_analysis_fifo #(axi_seq_item) monoutwr_fifo;
 uvm_tlm_analysis_fifo #(axi_seq_item) monoutrd_fifo;
 
-axi_seq_item monin_tr;
-axi_seq_item monout_tr;
+axi_seq_item monwrtr;
+axi_seq_item monrdtr;
 
 bit [31:0] mem [int];
 
@@ -19,6 +19,56 @@ function new(string name = "axi_scoreboard", uvm_component parent);
   monoutrd_fifo = new("monoutrd_fifo", this);
 endfunction
 
+task run_phase(uvm_phase phase);
+fork
+  write_check();
+  read_check();
+join
+endtask  
+
+task write_check();
+  axi_seq_item exp_tr;
+  axi_seq_item act_tr;
+  forever begin
+    moninwr_fifo.get(exp_tr);
+    ref_model_wr(exp_tr);
+    
+    monoutwr_fifo.get(act_tr);
+  
+    if(act_tr.BRESP != exp_tr.BRESP) begin
+    `uvm_error(get_type_name(),$sformatf("WR BRESP mismatch: AWADDR=0x%0h exp=%0b act=%0b",exp_tr.AWADDR, exp_tr.BRESP, act_tr.BRESP))
+    end else begin
+      `uvm_info(get_type_name(),
+        $sformatf("WR match: AWADDR=0x%0h BRESP=%0b", exp_tr.AWADDR, exp_tr.BRESP),UVM_HIGH)
+    end
+  end
+endtask
+
+task read_check();
+  axi_seq_item exp_tr;
+  axi_seq_item act_tr;
+  forever begin
+    moninrd_fifo.get(exp_tr);
+    ref_model_rd(exp_tr);
+    
+    monoutrd_fifo.get(act_tr);
+    
+    if (act_tr.RRESP !== exp_tr.RRESP) begin
+      `uvm_error(get_type_name(),
+        $sformatf("RD RRESP mismatch: ARADDR=0x%0h exp=%0b act=%0b",
+                   exp_tr.ARADDR, exp_tr.RRESP, act_tr.RRESP))
+    end
+    else if (exp_tr.RRESP == 2'b00 && act_tr.RDATA !== exp_tr.RDATA) begin
+      `uvm_error(get_type_name(),
+        $sformatf("RD DATA mismatch: ARADDR=0x%0h exp=0x%0h act=0x%0h",
+                   exp_tr.ARADDR, exp_tr.RDATA, act_tr.RDATA))
+    end else begin
+      `uvm_info(get_type_name(),
+        $sformatf("RD match: ARADDR=0x%0h RDATA=0x%0h", exp_tr.ARADDR, exp_tr.RDATA),
+        UVM_HIGH)
+    end
+  end
+endtask
 
 task ref_model_wr(axi_seq_item tr);
      if(tr.AWADDR[1:0] != 2'b00)

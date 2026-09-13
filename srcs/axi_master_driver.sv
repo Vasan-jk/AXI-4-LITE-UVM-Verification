@@ -33,11 +33,14 @@ task write_op();
 forever begin
   seq_item_port.get_next_item(trw);
   fork
+    begin
     wr_addr(trw);
     wr_data(trw);
+    end
   join
   wr_response(trw);
   seq_item_port.item_done();
+  $display("WRITE HANDSHAKE COMPLETE");
 end
 endtask
 
@@ -57,7 +60,7 @@ task wr_addr(axi_seq_item wrar);
   vif.drv_cb.AWPROT <= wrar.AWPROT;
   do
    @(vif.drv_cb); 
-  while(!vif.drv_cb.AWREADY && !wrar.AWVALID);
+  while(!vif.drv_cb.AWREADY);
     vif.drv_cb.AWVALID <= 0;
 endtask
 task wr_data(axi_seq_item wrdt);
@@ -66,7 +69,7 @@ task wr_data(axi_seq_item wrdt);
   vif.drv_cb.WVALID <= wrdt.WVALID;
   do
    @(vif.drv_cb); 
-  while(!vif.drv_cb.WREADY && !wrdt.WVALID);
+  while(!vif.drv_cb.WREADY);
     vif.drv_cb.WVALID <= 0;
 endtask
 
@@ -81,14 +84,14 @@ task rd_addr(axi_seq_item rdar);
   vif.drv_cb.ARVALID <= rdar.ARVALID; 
   do
    @(vif.drv_cb); 
-  while(!vif.drv_cb.ARREADY && !rdar.ARVALID);
+  while(!vif.drv_cb.ARREADY);
     vif.drv_cb.ARVALID <= 0;
 endtask
 
 task rd_data(axi_seq_item rddt);
   do
    @(vif.drv_cb); 
-  while(!rddt.RREADY && !vif.drv_cb.RVALID);
+  while(!rddt.RREADY);
   vif.drv_cb.RREADY <= rddt.RREADY;
 endtask
 endclass

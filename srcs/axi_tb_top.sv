@@ -15,7 +15,7 @@ axi_interface duvif(clk,rst);
         .DEFAULT_PROT(3'b000)
     ) DUV (
         .ACLK    (clk),
-        .ARESETn (duvif.ARESETn),
+        .ARESETn (rst),
 
         .AWADDR  (duvif.AWADDR),
         .AWPROT  (duvif.AWPROT),
@@ -54,9 +54,11 @@ end
 initial begin
   clk = 1'b0;
   rst = 0;
-  forever #5 clk = ~clk;
   #20;
   rst = 1;
+end
+initial begin
+  forever #5 clk = ~clk;
 end
 
 endmodule

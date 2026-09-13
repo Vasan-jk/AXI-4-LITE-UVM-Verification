@@ -11,7 +11,10 @@ function void build_phase(uvm_phase phase);
   super.build_phase(phase);
   a_cfg = axi_config::type_id::create("a_cfg");
   
-  if(!(uvm_config_db#(virtual axi_interface)::get(this,"","axi_if",a_cfg.vif)))
+  if(!(uvm_config_db#(virtual axi_interface)::get(this,"","axi_if",a_cfg.vif))) begin
+    `uvm_fatal("TEST","TEST is not configured")
+  end
+
   a_cfg.input_agent_is_active = UVM_ACTIVE;
   a_cfg.output_agent_is_active = UVM_PASSIVE;
   
