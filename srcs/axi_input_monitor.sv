@@ -6,6 +6,7 @@ uvm_analysis_port #(axi_seq_item) inwr_port;
 uvm_analysis_port #(axi_seq_item) inrd_port;
 axi_seq_item wrtr;
 axi_seq_item rdtr;
+bit w_done,aw_done;
 
 function new(string name = "axi_input_monitor", uvm_component parent);
   super.new(name, parent);
@@ -35,19 +36,29 @@ fork
     wrtr.AWPROT = vif.monin_cb.AWPROT;
     wrtr.AWADDR = vif.monin_cb.AWADDR;
     $display("GOT AWVALID and AWREADY");
+    aw_done = 1;
   end
   if(vif.monin_cb.WVALID && vif.monin_cb.WREADY) begin  
     wrtr.WDATA = vif.monin_cb.WDATA; 
     wrtr.WSTRB = vif.monin_cb.WSTRB;
     $display("GOT WVALID and WREADY");
+    w_done = 1;
   end
 join
-inwr_port.write(wrtr);
-`uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR\n%s",wrtr.sprint()),UVM_NONE)
+
+if(aw_done && w_done) begin
+  inwr_port.write(wrtr);
+  `uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR[WRITE TRANSACTION]\n%s",wrtr.sprint()),UVM_NONE)
+  wrtr = axi_seq_item::type_id::create("wrtr");
+  aw_done = 0;
+  w_done  = 0;
+end
+  
   if(vif.monin_cb.ARVALID && vif.monin_cb.ARREADY) begin
     rdtr.ARADDR = vif.monin_cb.ARADDR;
+    inrd_port.write(rdtr);
+  `uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR[READ TRANSACTION]\n%s",wrtr.sprint()),UVM_NONE)
   end
-inrd_port.write(rdtr);
 end
 endtask
 endclass

@@ -24,8 +24,13 @@ endfunction
 task run_phase(uvm_phase phase);
   repeat(3)@(vif.drv_cb);
   fork
+  begin
     write_op();
+  end
+  begin
+    @(vif.drv_cb);
     read_op();
+  end
   join
 endtask
 
@@ -86,12 +91,15 @@ task rd_addr(axi_seq_item rdar);
    @(vif.drv_cb); 
   while(!vif.drv_cb.ARREADY);
     vif.drv_cb.ARVALID <= 0;
+    
 endtask
 
 task rd_data(axi_seq_item rddt);
+  vif.drv_cb.RREADY <= 1;
   do
    @(vif.drv_cb); 
-  while(!rddt.RREADY);
-  vif.drv_cb.RREADY <= rddt.RREADY;
+  while(!vif.drv_cb.RVALID);
+  $display("RVALID IS HIGH: %b",vif.drv_cb.RVALID);
+  vif.drv_cb.RREADY <= 0;
 endtask
 endclass
