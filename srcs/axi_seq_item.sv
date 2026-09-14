@@ -11,7 +11,7 @@ bit WREADY;
 
 rand bit BREADY;
 bit BVALID;
-bit BRESP;
+bit [1:0]BRESP;
 
 rand bit [`ADDR_WIDTH-1:0] ARADDR;
 rand bit [2:0] ARPROT;
@@ -19,8 +19,8 @@ rand bit ARVALID;
 bit ARREADY;
 
 rand bit RREADY;
-bit RDATA;
-bit RRESP;
+bit [`DATA_WIDTH-1:0]RDATA;
+bit [1:0]RRESP;
 bit RVALID;
 
 rand bit [1:0] wrsel;

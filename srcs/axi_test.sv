@@ -53,3 +53,33 @@ task run_phase(uvm_phase phase);
  endtask
 
 endclass
+
+class rewr_test extends test;
+`uvm_component_utils(rewr_test)
+read_test br;
+write_test bw;
+
+function new(string name = "rewr_test", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  fork begin
+  bw = write_test::type_id::create("s");
+  bw.start(env.inp_agnt.wrsqr);
+  end
+  begin
+  br = read_test::type_id::create("r");
+  br.start(env.inp_agnt.rdsqr);
+  end
+  join
+  #40;
+  phase.drop_objection(this);
+ endtask
+
+endclass

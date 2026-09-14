@@ -52,19 +52,22 @@ task read_check();
   forever begin
     moninrd_fifo.get(exp_tr);
     ref_model_rd(exp_tr);
-    
     monoutrd_fifo.get(act_tr);
-    
+
     if (act_tr.RRESP !== exp_tr.RRESP) begin
-      `uvm_error(get_type_name(),
-        $sformatf("RD RRESP mismatch: ARADDR=0x%0h exp=%0b act=%0b",
-                   exp_tr.ARADDR, exp_tr.RRESP, act_tr.RRESP))
+      `uvm_error(get_type_name(),$sformatf("RD RRESP mismatch: ARADDR=0x%0h exp=%0b act=%0b",exp_tr.ARADDR, exp_tr.RRESP, act_tr.RRESP))
     end
     else if (exp_tr.RRESP == 2'b00 && act_tr.RDATA !== exp_tr.RDATA) begin
       `uvm_error(get_type_name(),
         $sformatf("RD DATA mismatch: ARADDR=0x%0h exp=0x%0h act=0x%0h",
                    exp_tr.ARADDR, exp_tr.RDATA, act_tr.RDATA))
-    end else begin
+    end 
+    else if (exp_tr.RRESP != 2'b00 && act_tr.RDATA !== 32'h0) begin
+      `uvm_error(get_type_name(),
+        $sformatf("RD ERROR LEAK: RDATA must be 0 on error. ARADDR=0x%0h RRESP=%0b act_data=0x%0h", 
+                   exp_tr.ARADDR, act_tr.RRESP, act_tr.RDATA))
+    end
+    else begin
       `uvm_info(get_type_name(),
         $sformatf("RD match: ARADDR=0x%0h RDATA=0x%0h", exp_tr.ARADDR, exp_tr.RDATA),
         UVM_HIGH)
@@ -82,7 +85,7 @@ task ref_model_wr(axi_seq_item tr);
      else begin
         for(int i = 0; i < 4; i++) begin
            if(tr.WSTRB[i])  
-            mem[tr.AWADDR[5:2]][i*8 +:8] = tr.WDATA[i*8 +:8];
+            mem[tr.AWADDR][i*8 +:8] = tr.WDATA[i*8 +:8];
         end
      end
 endtask

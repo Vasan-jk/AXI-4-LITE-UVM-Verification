@@ -27,7 +27,7 @@ task body();
   repeat(`num_of_transaction) begin
   req = axi_seq_item::type_id::create("req");
     start_item(req);
-    assert(req.randomize() with {AWADDR == 0; AWVALID == 1; WDATA == 100; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
+    assert(req.randomize() with {AWADDR == 16; AWVALID == 1; WDATA == 100; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
     finish_item(req);
   end
 endtask
@@ -45,7 +45,43 @@ task body();
   repeat(`num_of_transaction) begin
   req = axi_seq_item::type_id::create("req");
     start_item(req);
-    assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR == 0; RREADY == 1; }  );
+    assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR == 16; RREADY == 1; }  );
+    finish_item(req);
+  end
+endtask
+
+endclass
+
+
+class write_test extends uvm_sequence#(axi_seq_item);
+`uvm_object_utils(write_test)
+
+function new(string name = "base_write");
+  super.new(name);
+endfunction
+
+task body();
+  repeat(`num_of_transaction) begin
+  req = axi_seq_item::type_id::create("req");
+    start_item(req);
+    assert(req.randomize() with {AWADDR % 4 == 0; AWADDR inside{[1:33]}; AWVALID == 1; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
+    finish_item(req);
+  end
+endtask
+
+endclass
+
+class read_test extends uvm_sequence#(axi_seq_item);
+`uvm_object_utils(read_test)
+function new(string name = "base_read");
+  super.new(name);
+endfunction
+
+task body();
+  repeat(`num_of_transaction) begin
+  req = axi_seq_item::type_id::create("req");
+    start_item(req);
+    assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR[1:0] == 2'b00; ARADDR inside {[1:32]}; RREADY == 1; }  );
     finish_item(req);
   end
 endtask
