@@ -31,9 +31,11 @@ task write_check();
   axi_seq_item act_tr;
   forever begin
     moninwr_fifo.get(exp_tr);
+    `uvm_info("SCOREBOARD",$sformatf("INPUT MONITOR\n%s",exp_tr.sprint()),UVM_HIGH)
     ref_model_wr(exp_tr);
     
     monoutwr_fifo.get(act_tr);
+    `uvm_info("SCOREBOARD",$sformatf("OUTPUT MONITOR\n%s",act_tr.sprint()),UVM_HIGH)
   
     if(act_tr.BRESP != exp_tr.BRESP) begin
     `uvm_error(get_type_name(),$sformatf("WR BRESP mismatch: AWADDR=0x%0h exp=%0b act=%0b",exp_tr.AWADDR, exp_tr.BRESP, act_tr.BRESP))

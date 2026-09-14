@@ -25,15 +25,16 @@ function void connect_phase(uvm_phase phase);
 endfunction
 
 task run_phase(uvm_phase phase);
-repeat(6) @(vif.monout_cb);
-wrtr = axi_seq_item::type_id::create("wrtr");
-rdtr = axi_seq_item::type_id::create("rdtr");
+repeat(3) @(vif.monout_cb);
 forever begin
 @(vif.monout_cb);
+wrtr = axi_seq_item::type_id::create("wrtr");
+rdtr = axi_seq_item::type_id::create("rdtr");
  if(vif.monout_cb.BVALID && vif.monout_cb.BREADY) begin
   wrtr.BRESP = vif.monout_cb.BRESP; 
   outwr_port.write(wrtr);
   $display("OUTMON WRITE TRANSACTION SENT TO SCB"); 
+  `uvm_info("OUTPUT_MONITOR",$sformatf("Output MONITOR\n%s",wrtr.sprint()),UVM_HIGH)
  end
  
  if(vif.monout_cb.RVALID && vif.monout_cb.RREADY) begin
@@ -41,8 +42,8 @@ forever begin
   rdtr.RRESP = vif.monout_cb.RRESP; 
   outrd_port.write(rdtr); 
   $display("OUTMON READ TRANSACTION SENT TO SCB"); 
+  `uvm_info("OUTPUT_MONITOR",$sformatf("Output MONITOR\n%s",rdtr.sprint()),UVM_HIGH)
  end
-  `uvm_info("OUTPUT_MONITOR",$sformatf("Output MONITOR\n%s",wrtr.sprint()),UVM_HIGH)
 end
 endtask
 endclass

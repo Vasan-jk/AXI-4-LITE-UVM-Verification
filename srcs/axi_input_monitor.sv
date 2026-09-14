@@ -25,7 +25,7 @@ function void connect_phase(uvm_phase phase);
 endfunction
 
 task run_phase(uvm_phase phase);
-repeat(6) @(vif.monin_cb);
+repeat(3) @(vif.monin_cb);
 wrtr = axi_seq_item::type_id::create("wrtr");
 rdtr = axi_seq_item::type_id::create("rdtr");
 forever begin
@@ -34,10 +34,12 @@ fork
   if(vif.monin_cb.AWVALID && vif.monin_cb.AWREADY) begin
     wrtr.AWPROT = vif.monin_cb.AWPROT;
     wrtr.AWADDR = vif.monin_cb.AWADDR;
+    $display("GOT AWVALID and AWREADY");
   end
   if(vif.monin_cb.WVALID && vif.monin_cb.WREADY) begin  
     wrtr.WDATA = vif.monin_cb.WDATA; 
     wrtr.WSTRB = vif.monin_cb.WSTRB;
+    $display("GOT WVALID and WREADY");
   end
 join
 inwr_port.write(wrtr);
@@ -46,7 +48,6 @@ inwr_port.write(wrtr);
     rdtr.ARADDR = vif.monin_cb.ARADDR;
   end
 inrd_port.write(rdtr);
-//`uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR\n%s",rdtr.sprint()),UVM_NONE)
 end
 endtask
 endclass

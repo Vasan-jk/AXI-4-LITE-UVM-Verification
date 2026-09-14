@@ -12,7 +12,7 @@ logic WREADY;
 
 logic BREADY;
 logic BVALID;
-logic BRESP;
+logic [1:0]BRESP;
 
 logic [`ADDR_WIDTH-1:0] ARADDR;
 logic [2:0] ARPROT;
@@ -20,8 +20,8 @@ logic ARVALID;
 logic ARREADY;
 
 logic RREADY;
-logic RDATA;
-logic RRESP;
+logic [`DATA_WIDTH-1:0]RDATA;
+logic [1:0]RRESP;
 logic RVALID;
 
 clocking drv_cb@(posedge ACLK);
