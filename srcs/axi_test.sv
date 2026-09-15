@@ -113,3 +113,51 @@ task run_phase(uvm_phase phase);
  endtask
 
 endclass
+
+class write_in_read_only extends test;
+`uvm_component_utils(write_in_read_only)
+axi_write_ro_sequence bw;
+function new(string name = "write_in_read_only", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  fork begin
+  bw = axi_write_ro_sequence::type_id::create("s");
+  bw.start(env.inp_agnt.wrsqr);
+  end
+  join
+  #40;
+  phase.drop_objection(this);
+ endtask
+
+endclass
+
+class read_in_write_only extends test;
+`uvm_component_utils(read_in_write_only)
+axi_read_wo_sequence bw;
+function new(string name = "read_in_write_only", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  fork begin
+  bw = axi_read_wo_sequence::type_id::create("s");
+  bw.start(env.inp_agnt.wrsqr);
+  end
+  join
+  #40;
+  phase.drop_objection(this);
+ endtask
+
+endclass

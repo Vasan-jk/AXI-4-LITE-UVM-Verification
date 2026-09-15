@@ -60,6 +60,7 @@ task read_op();
 endtask
 
 task wr_addr(axi_seq_item wrar);
+if(wrar.AWVALID) begin
   vif.drv_cb.AWADDR <= wrar.AWADDR;
   vif.drv_cb.AWVALID <= wrar.AWVALID;
   vif.drv_cb.AWPROT <= wrar.AWPROT;
@@ -67,8 +68,10 @@ task wr_addr(axi_seq_item wrar);
    @(vif.drv_cb); 
   while(!vif.drv_cb.AWREADY);
     vif.drv_cb.AWVALID <= 0;
+end
 endtask
 task wr_data(axi_seq_item wrdt);
+if(wrdt.WVALID) begin
   vif.drv_cb.WDATA <= wrdt.WDATA;
   vif.drv_cb.WSTRB <= wrdt.WSTRB;
   vif.drv_cb.WVALID <= wrdt.WVALID;
@@ -76,14 +79,21 @@ task wr_data(axi_seq_item wrdt);
    @(vif.drv_cb); 
   while(!vif.drv_cb.WREADY);
     vif.drv_cb.WVALID <= 0;
+end
 endtask
 
 task wr_response(axi_seq_item wrsp);
-  wait(vif.drv_cb.BVALID);
-  vif.drv_cb.BREADY <= wrsp.BREADY;
+if(wrsp.BREADY) begin
+    vif.drv_cb.BREADY <= 1;
+  do
+    @(vif.drv_cb);
+  while(!vif.drv_cb.BVALID);
+  vif.drv_cb.BREADY <= 0;
+end
 endtask
 
 task rd_addr(axi_seq_item rdar);
+if(rdar.ARVALID) begin
   vif.drv_cb.ARADDR <= rdar.ARADDR;
   vif.drv_cb.ARPROT <= rdar.ARPROT;
   vif.drv_cb.ARVALID <= rdar.ARVALID; 
@@ -91,15 +101,17 @@ task rd_addr(axi_seq_item rdar);
    @(vif.drv_cb); 
   while(!vif.drv_cb.ARREADY);
     vif.drv_cb.ARVALID <= 0;
-    
+end
 endtask
 
 task rd_data(axi_seq_item rddt);
+if(rddt.RREADY) begin
   vif.drv_cb.RREADY <= 1;
   do
    @(vif.drv_cb); 
   while(!vif.drv_cb.RVALID);
   $display("RVALID IS HIGH: %b",vif.drv_cb.RVALID);
   vif.drv_cb.RREADY <= 0;
+end
 endtask
 endclass

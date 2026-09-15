@@ -124,3 +124,85 @@ endtask
 
 endclass
 
+class axi_write_ro_sequence extends axi_sequence;
+`uvm_object_utils(axi_write_ro_sequence)
+ 
+function new(string name = "axi_write_ro_sequence");
+  super.new(name);
+endfunction
+ 
+task body();
+  write_ro_seq_new();
+endtask
+ 
+task write_ro_seq_new();
+  repeat(`num_of_transaction)begin
+ 
+    req = axi_seq_item::type_id::create("req");
+    start_item(req);
+ 
+    assert(req.randomize() with {
+      AWVALID == 1;
+      AWADDR inside {32'h28,32'h2C,32'h30};
+      WVALID == 0;
+      WSTRB == 4'b1111;
+      WDATA == 5;
+      BREADY == 0;
+      ARVALID == 0;
+      RREADY == 0;
+    });
+ 
+    finish_item(req);
+ 
+    req = axi_seq_item::type_id::create("req");
+    start_item(req);
+ 
+    assert(req.randomize() with {
+      AWVALID == 0;
+      AWADDR inside {32'h28,32'h2C,32'h30};
+      WVALID == 1;
+      WSTRB == 4'b1111;
+      WDATA inside {[100:200]};
+      BREADY == 1;
+      ARVALID == 0;
+      RREADY == 0;
+    });
+ 
+    finish_item(req);
+ 
+  end
+endtask
+endclass
+ 
+ 
+class axi_read_wo_sequence extends axi_sequence;
+`uvm_object_utils(axi_read_wo_sequence)
+ 
+function new(string name = "axi_read_wo_sequence");
+  super.new(name);
+endfunction
+ 
+task body();
+  read_wo_seq_new();
+endtask
+ 
+task read_wo_seq_new();
+  repeat(`num_of_transaction)begin
+ 
+    req = axi_seq_item::type_id::create("req");
+    start_item(req);
+ 
+    assert(req.randomize() with {
+      AWVALID == 0;
+      WVALID  == 0;
+      BREADY  == 0;
+      ARVALID  == 1;
+      ARADDR  inside {32'h34,32'h38};
+      RREADY  == 1;
+    });
+ 
+    finish_item(req);
+ 
+  end
+endtask
+endclass
