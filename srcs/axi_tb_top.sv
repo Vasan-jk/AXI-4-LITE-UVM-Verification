@@ -1,6 +1,7 @@
 `include "axi_interface.sv"
 `include "axi_rtl.sv"
 `include "axi_test_pkg.sv"
+`include "axi_assertion.sv"
 
 module axi_tb_top;
 import uvm_pkg::*;
@@ -42,7 +43,35 @@ axi_interface duvif(clk,rst);
         .RREADY  (duvif.RREADY)
     );
 
+bind axi4_lite_slave axi_assertion
+ ast (
+        .ACLK    (clk),
+        .ARESETn (rst),
 
+        .AWADDR  (AWADDR),
+        .AWPROT  (AWPROT),
+        .AWVALID (AWVALID),
+        .AWREADY (AWREADY),
+
+        .WDATA   (WDATA),
+        .WSTRB   (WSTRB),
+        .WVALID  (WVALID),
+        .WREADY  (WREADY),
+
+        .BRESP   (BRESP),
+        .BVALID  (BVALID),
+        .BREADY  (BREADY),
+
+        .ARADDR  (ARADDR),
+        .ARPROT  (ARPROT),
+        .ARVALID (ARVALID),
+        .ARREADY (ARREADY),
+
+        .RDATA   (RDATA),
+        .RRESP   (RRESP),
+        .RVALID  (RVALID),
+        .RREADY  (RREADY)
+    );
 initial begin
 uvm_config_db#(virtual axi_interface)::set(null,"*","axi_if",duvif);
 
