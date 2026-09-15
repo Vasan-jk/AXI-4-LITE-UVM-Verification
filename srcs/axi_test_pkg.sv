@@ -12,6 +12,7 @@ import uvm_pkg::*;
 `include "axi_output_monitor.sv"
 `include "axi_input_agent.sv"
 `include "axi_scoreboard.sv"
+`include "axi_subscriber.sv"
 `include "axi_output_agent.sv"
 `include "axi_environment.sv"
 `include "axi_sequence.sv"
