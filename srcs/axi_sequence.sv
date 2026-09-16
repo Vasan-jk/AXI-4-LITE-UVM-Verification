@@ -206,3 +206,66 @@ task read_wo_seq_new();
   end
 endtask
 endclass
+
+class error_addr_write extends uvm_sequence#(axi_seq_item);
+`uvm_object_utils(error_addr_write)
+
+function new(string name = "base_write");
+  super.new(name);
+endfunction
+
+task body();
+  repeat(`num_of_transaction) begin
+  req = axi_seq_item::type_id::create("req");
+    start_item(req);
+    assert(req.randomize() with {AWADDR > 32'h3c; AWVALID == 1; WDATA == 100; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
+    finish_item(req);
+  end
+endtask
+
+endclass
+
+class error_addr_read extends uvm_sequence#(axi_seq_item);                                                                           
+`uvm_object_utils(error_addr_read)                                                                                                   
+function new(string name = "base_read");                                                                                               super.new(name);                                                                                                                   
+endfunction                                                                                                                          
+                                                                                                                                     task body();                                                                                                                           repeat(`num_of_transaction) begin                                                                                                    req = axi_seq_item::type_id::create("req");                                                                                            start_item(req);                                                                                                                     assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR > 32'h3c; RREADY == 1; }  );
+                                                                                                                                    
+finish_item(req); 
+end
+endtask                                                                                                                                                                                                                                                                   endclass
+
+
+class minmax_addr_write extends uvm_sequence#(axi_seq_item);
+`uvm_object_utils(minmax_addr_write)
+
+function new(string name = "base_write");
+  super.new(name);
+endfunction
+
+task body();
+  repeat(`num_of_transaction) begin
+  req = axi_seq_item::type_id::create("req");
+    start_item(req);
+    assert(req.randomize() with {AWADDR inside {32'h0,32'hFFFF_FFFF}; AWVALID == 1; WDATA == 100; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
+    finish_item(req);
+  end
+endtask
+endclass
+class minmax_addr_read extends uvm_sequence#(axi_seq_item);
+`uvm_object_utils(minmax_addr_read)
+
+function new(string name = "base_read");
+  super.new(name);
+endfunction
+
+task body();
+  repeat(`num_of_transaction) begin
+  req = axi_seq_item::type_id::create("req");
+    start_item(req);
+    assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR inside{32'h0,32'hFFFF_FFFF}; RREADY == 1; }  );
+    finish_item(req);
+  end
+endtask
+
+endclass

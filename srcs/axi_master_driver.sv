@@ -101,6 +101,7 @@ if(rdar.ARVALID) begin
    @(vif.drv_cb); 
   while(!vif.drv_cb.ARREADY);
     vif.drv_cb.ARVALID <= 0;
+    $display("[DRIVER] Read ADDR handshake completed");
 end
 endtask
 
@@ -112,6 +113,7 @@ if(rddt.RREADY) begin
   while(!vif.drv_cb.RVALID);
   $display("RVALID IS HIGH: %b",vif.drv_cb.RVALID);
   vif.drv_cb.RREADY <= 0;
+    $display("[DRIVER] Read DATA handshake completed");
 end
 endtask
 endclass

@@ -33,12 +33,16 @@ forever begin
 @(vif.monin_cb);
 fork
   if(vif.monin_cb.AWVALID && vif.monin_cb.AWREADY) begin
+    wrtr.AWVALID = vif.monin_cb.AWVALID;
+    wrtr.AWREADY = vif.monin_cb.AWREADY;
     wrtr.AWPROT = vif.monin_cb.AWPROT;
     wrtr.AWADDR = vif.monin_cb.AWADDR;
     $display("GOT AWVALID and AWREADY");
     aw_done = 1;
   end
   if(vif.monin_cb.WVALID && vif.monin_cb.WREADY) begin  
+    wrtr.WVALID = vif.monin_cb.WVALID;
+    wrtr.WREADY = vif.monin_cb.WREADY;
     wrtr.WDATA = vif.monin_cb.WDATA; 
     wrtr.WSTRB = vif.monin_cb.WSTRB;
     $display("GOT WVALID and WREADY");
@@ -56,6 +60,8 @@ end
   
   if(vif.monin_cb.ARVALID && vif.monin_cb.ARREADY) begin
     rdtr.ARADDR = vif.monin_cb.ARADDR;
+    rdtr.ARVALID = vif.monin_cb.ARVALID;
+    rdtr.ARREADY = vif.monin_cb.ARREADY;
     inrd_port.write(rdtr);
   `uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR[READ TRANSACTION]\n%s",wrtr.sprint()),UVM_NONE)
   end

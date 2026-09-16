@@ -15,7 +15,7 @@ TESTNAME  ?= base_test
 VERBOSITY ?= UVM_HIGH
 
 # List of tests to run in regression (space-separated)
-TEST_LIST = base_test rewr_test rewr_valid_test write_in_read_only read_in_write_only
+TEST_LIST = base_test rewr_test rewr_valid_test write_in_read_only read_in_write_only write_error_addr read_error_addr minmax_addr_test
 
 # --- Targets ---
 .PHONY: help compile run regression clean report $(TEST_LIST)

@@ -153,10 +153,83 @@ task run_phase(uvm_phase phase);
   phase.raise_objection(this);
   fork begin
   bw = axi_read_wo_sequence::type_id::create("s");
+  bw.start(env.inp_agnt.rdsqr);
+  end
+  join
+  #40;
+  phase.drop_objection(this);
+ endtask
+
+endclass
+
+class write_error_addr extends test;
+`uvm_component_utils(write_error_addr)
+error_addr_write bw;
+function new(string name = "write_error_addr", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  fork begin
+  bw = error_addr_write::type_id::create("s");
   bw.start(env.inp_agnt.wrsqr);
   end
   join
   #40;
+  phase.drop_objection(this);
+ endtask
+
+endclass
+
+class read_error_addr extends test;
+`uvm_component_utils(read_error_addr)
+error_addr_read bw;
+function new(string name = "read_error_addr", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  fork begin
+  bw = error_addr_read::type_id::create("s");
+  bw.start(env.inp_agnt.rdsqr);
+  end
+  join
+  #40;
+  phase.drop_objection(this);
+ endtask
+
+endclass
+
+class minmax_addr_test extends test;
+`uvm_component_utils(minmax_addr_test)
+minmax_addr_read br;
+minmax_addr_write bw;
+
+function new(string name = "minmax_addr_test", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  bw = minmax_addr_write::type_id::create("s");
+  bw.start(env.inp_agnt.wrsqr);
+  br = minmax_addr_read::type_id::create("r");
+  br.start(env.inp_agnt.rdsqr);
+  #40; 
   phase.drop_objection(this);
  endtask
 

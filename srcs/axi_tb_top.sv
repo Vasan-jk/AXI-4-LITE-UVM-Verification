@@ -45,8 +45,8 @@ axi_interface duvif(clk,rst);
 
 bind axi4_lite_slave axi_assertion
  ast (
-        .ACLK    (clk),
-        .ARESETn (rst),
+        .ACLK    (ACLK),
+        .ARESETn (ARESETn),
 
         .AWADDR  (AWADDR),
         .AWPROT  (AWPROT),
