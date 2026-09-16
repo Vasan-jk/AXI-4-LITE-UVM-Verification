@@ -11,53 +11,41 @@ class axi_subscriber extends uvm_component;
   uvm_analysis_imp_outwr #(axi_seq_item, axi_subscriber) ap_outwr;
   uvm_analysis_imp_outrd #(axi_seq_item, axi_subscriber) ap_outrd;
 
-  axi_seq_item wr_q [$];
-  axi_seq_item rd_q [$];
 
-  covergroup cg_write with function sample(bit [31:0] addr, bit [2:0] prot, bit [31:0] data, bit [3:0] strb, bit [1:0] resp);
+  axi_seq_item tr;
+
+  covergroup cg_write;
     option.per_instance = 1;
-    
-    cp_awaddr : coverpoint addr {
-      bins valid_memory   = {[32'h0 : 32'h3F]};
-      bins invalid_memory = {[32'h40 : $]};
+
+    awaddr_cp: coverpoint tr.AWADDR {
+      bins b1 = {[32'h00000000 : 32'h00000024]};
+      bins b2 = {[32'h00000028 : 32'h00000030]};
+      bins b3 = {[32'h00000034 : 32'h00000038]};
+      bins b4 = {32'h0000003C};
+      bins others = default;
     }
-    cp_awprot : coverpoint prot {
-      bins all_prots[] = {[0:7]};
+
+    wdata_cp: coverpoint tr.WDATA {
+      bins low  = {[32'h0000_0000 : 32'h5555_5555]};
+      bins mid  = {[32'h5555_5556 : 32'hAAAA_AAAA]};
+      bins high = {[32'hAAAA_AAAB : 32'hFFFF_FFFF]};
     }
-    cp_wstrb : coverpoint strb {
-      bins all_bytes   = {4'b1111};
-      bins no_bytes    = {4'b0000};
-      bins single_byte = {4'b0001, 4'b0010, 4'b0100, 4'b1000};
-      bins partial     = default;
+
+    wstrb_cp: coverpoint tr.WSTRB {
+      bins b2[] = {[4'b0000 : 4'b1111]};
     }
-    cp_bresp : coverpoint resp {
-      bins OKAY   = {2'b00};
-      bins SLVERR = {2'b10};
-      bins DECERR = {2'b11};
-      illegal_bins EXOKAY = {2'b01};
-    }
-    
-    cross_addr_x_resp : cross cp_awaddr, cp_bresp;
   endgroup
 
-  covergroup cg_read with function sample(bit [31:0] addr, bit [2:0] prot, bit [1:0] resp);
+  covergroup cg_read;
     option.per_instance = 1;
-    
-    cp_araddr : coverpoint addr {
-      bins valid_memory   = {[32'h0 : 32'h3F]};
-      bins invalid_memory = {[32'h40 : $]};
-    }
-    cp_arprot : coverpoint prot {
-      bins all_prots[] = {[0:7]};
-    }
-    cp_rresp : coverpoint resp {
-      bins OKAY   = {2'b00};
-      bins SLVERR = {2'b10};
-      bins DECERR = {2'b11};
-      illegal_bins EXOKAY = {2'b01};
-    }
 
-    cross_addr_x_resp : cross cp_araddr, cp_rresp;
+    araddr_cp: coverpoint tr.ARADDR {
+      bins b1 = {[32'h00000000 : 32'h00000024]};
+      bins b2 = {[32'h00000028 : 32'h00000030]};
+      bins b3 = {[32'h00000034 : 32'h00000038]};
+      bins b4 = {32'h0000003C};
+      bins others = default;
+    }
   endgroup
 
   function new(string name = "axi_subscriber", uvm_component parent);
@@ -71,32 +59,28 @@ class axi_subscriber extends uvm_component;
   endfunction
 
   function void write_inwr(axi_seq_item t);
-    wr_q.push_back(t);
+    tr = t;
+    cg_write.sample();
   endfunction
 
   function void write_inrd(axi_seq_item t);
-    rd_q.push_back(t);
+    tr = t;
+    cg_read.sample();
   endfunction
 
   function void write_outwr(axi_seq_item t);
-    axi_seq_item req;
-    if(wr_q.size() > 0) begin
-      req = wr_q.pop_front();
-      cg_write.sample(req.AWADDR, req.AWPROT, req.WDATA, req.WSTRB, t.BRESP);
-    end
+    tr = t;
+    cg_write.sample();
   endfunction
 
   function void write_outrd(axi_seq_item t);
-    axi_seq_item req;
-    if(rd_q.size() > 0) begin
-      req = rd_q.pop_front();
-      cg_read.sample(req.ARADDR, req.ARPROT, t.RRESP);
-    end
+    tr = t;
+    cg_read.sample();
   endfunction
 
   function void report_phase(uvm_phase phase);
-    `uvm_info("COVERAGE", $sformatf("Write Coverage = %0.2f%% | Read Coverage = %0.2f%%", 
-              cg_write.get_coverage(), cg_read.get_coverage()), UVM_NONE)
+    `uvm_info("COVERAGE", $sformatf("Write Coverage = %0.2f%% | Read Coverage = %0.2f%%",
+                cg_write.get_coverage(), cg_read.get_coverage()), UVM_NONE)
   endfunction
 
 endclass

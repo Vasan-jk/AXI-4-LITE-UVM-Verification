@@ -234,3 +234,28 @@ task run_phase(uvm_phase phase);
  endtask
 
 endclass
+
+class wait_test extends test;
+`uvm_component_utils(wait_test)
+//base_read br;
+wait_write bw;
+
+function new(string name = "wait_test", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  bw = wait_write::type_id::create("s");
+  bw.start(env.inp_agnt.wrsqr);
+  //br = base_read::type_id::create("r");
+  //br.start(env.inp_agnt.rdsqr);
+  #40;
+  phase.drop_objection(this);
+ endtask
+
+endclass

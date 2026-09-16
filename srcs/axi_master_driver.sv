@@ -39,8 +39,12 @@ forever begin
   seq_item_port.get_next_item(trw);
   fork
     begin
-    wr_addr(trw);
-    wr_data(trw);
+      repeat(trw.wt_addr) @(vif.drv_cb);
+      wr_addr(trw);
+    end
+    begin
+      repeat(trw.wt_data) @(vif.drv_cb);
+      wr_data(trw);
     end
   join
   wr_response(trw);
@@ -53,8 +57,9 @@ endtask
 task read_op();
   forever begin
     rep.get_next_item(trr);
-      rd_addr(trr);
-      rd_data(trr);
+    //repeat(trr.wt_addr) @(vif.drv_cb);
+    rd_addr(trr);
+    rd_data(trr);
     rep.item_done();
   end
 endtask

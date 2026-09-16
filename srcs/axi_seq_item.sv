@@ -23,7 +23,9 @@ bit [`DATA_WIDTH-1:0]RDATA;
 bit [1:0]RRESP;
 bit RVALID;
 
-rand bit [1:0] wrsel;
+rand bit [2:0] wt_addr;
+rand bit [2:0] wt_data;
+
 `uvm_object_utils_begin(axi_seq_item)
 `uvm_field_int(AWADDR, UVM_ALL_ON)
 `uvm_field_int(AWVALID, UVM_ALL_ON)
@@ -50,4 +52,8 @@ function new(string name = "axi_seq_item");
   super.new(name);
 endfunction
 
+constraint rand_cycle{
+    soft wt_addr == 0;
+    soft wt_data == 1;
+}
 endclass

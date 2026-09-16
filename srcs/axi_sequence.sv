@@ -64,7 +64,7 @@ task body();
   repeat(`num_of_transaction) begin
   req = axi_seq_item::type_id::create("req");
     start_item(req);
-    assert(req.randomize() with {AWADDR % 4 == 0; AWADDR inside{[1:33]}; AWVALID == 1; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
+    assert(req.randomize() with {AWADDR % 4 == 0; AWADDR inside{[1:33]}; AWVALID == 1; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
     finish_item(req);
   end
 endtask
@@ -252,6 +252,7 @@ task body();
   end
 endtask
 endclass
+
 class minmax_addr_read extends uvm_sequence#(axi_seq_item);
 `uvm_object_utils(minmax_addr_read)
 
@@ -264,6 +265,18 @@ task body();
   req = axi_seq_item::type_id::create("req");
     start_item(req);
     assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR inside{32'h0,32'hFFFF_FFFF}; RREADY == 1; }  );
+    finish_item(req);
+  end
+endtask
+
+endclass
+
+class wait_write extends uvm_sequence#(axi_seq_item);                                                                                `uvm_object_utils(wait_write)                                                                                                        
+function new(string name = "wait_write");                                                                                              super.new(name);
+endfunction                                                                                                                          
+task body();                                                                                                                           repeat(`num_of_transaction) begin
+  req = axi_seq_item::type_id::create("req");                                                                                            start_item(req);
+    assert(req.randomize() with {AWADDR % 4 ==0; AWADDR inside{[0:32]}; AWVALID == 1; WDATA == 100; WSTRB == 4'b1111; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; wt_addr inside{[0:7]}; wt_data inside {[0:7]}; wt_data != wt_addr;});
     finish_item(req);
   end
 endtask
