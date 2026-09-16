@@ -313,3 +313,27 @@ task run_phase(uvm_phase phase);
  endtask
 
 endclass
+
+class prot_read_addr extends test;
+`uvm_component_utils(prot_read_addr)
+prot_read bw;
+function new(string name = "prot_read_addr", uvm_component parent);
+  super.new(name, parent);
+endfunction
+
+function void build_phase(uvm_phase phase);
+ super.build_phase(phase);
+endfunction
+
+task run_phase(uvm_phase phase);
+  phase.raise_objection(this);
+  fork begin
+  bw = prot_read::type_id::create("s");
+  bw.start(env.inp_agnt.rdsqr);
+  end
+  join
+  #40;
+  phase.drop_objection(this);
+ endtask
+
+endclass

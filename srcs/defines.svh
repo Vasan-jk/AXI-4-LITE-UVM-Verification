@@ -3,4 +3,4 @@
 `define MEM_DEPTH  16
 `define DEFAULT_PROT  3'b000
 `define STRB_WIDTH  `DATA_WIDTH/8
-`define num_of_transaction 10
+`define num_of_transaction 100

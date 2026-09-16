@@ -81,7 +81,7 @@ task body();
   repeat(`num_of_transaction) begin
   req = axi_seq_item::type_id::create("req");
     start_item(req);
-    assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR[1:0] == 2'b00; ARADDR inside{[0:32'h27],32'h3C}; RREADY == 1; }  );
+    assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR[1:0] == 2'b00; ARADDR inside{[0:32'h27],32'h3C}; RREADY == 1; ARPROT inside {[0:7]}; }  );
     finish_item(req);
   end
 endtask
@@ -112,7 +112,7 @@ class write_valid_test extends uvm_sequence#(axi_seq_item);
 function new(string name = "base_write");
   super.new(name);
 endfunction
-bit [31:0] arr [] = {0,4,8,12,16,20,24,28,32,36,40}; 
+bit [31:0] arr [] = {0,4,8,12,16,20,24,28,32,36,40,32'h34,32'h38}; 
 task body();
   foreach(arr[i]) begin
   req = axi_seq_item::type_id::create("req");
@@ -348,6 +348,23 @@ task body();
   req = axi_seq_item::type_id::create("req");
     start_item(req);
     assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR == 32'h3C; RREADY == 1; }  );
+    finish_item(req);
+  end
+endtask
+
+endclass
+
+class prot_read extends uvm_sequence#(axi_seq_item);
+`uvm_object_utils(prot_read)
+function new(string name = "prot_read");
+  super.new(name);
+endfunction
+
+task body();
+  for(int i = 0; i < 8; i++) begin
+  req = axi_seq_item::type_id::create("req");
+    start_item(req);
+    assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR == i; ARPROT == i; RREADY == 1; }  );
     finish_item(req);
   end
 endtask

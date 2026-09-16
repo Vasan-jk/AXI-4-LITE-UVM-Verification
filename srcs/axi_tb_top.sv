@@ -76,6 +76,7 @@ initial begin
 uvm_config_db#(virtual axi_interface)::set(null,"*","axi_if",duvif);
 
 $dumpfile("axi_waves.vcd");
+$dumpfile("axi_waves.fsdb");
 $dumpvars;
 run_test();
 end

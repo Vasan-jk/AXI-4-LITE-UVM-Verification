@@ -62,6 +62,7 @@ end
     rdtr.ARADDR = vif.monin_cb.ARADDR;
     rdtr.ARVALID = vif.monin_cb.ARVALID;
     rdtr.ARREADY = vif.monin_cb.ARREADY;
+    rdtr.ARPROT = vif.monin_cb.ARPROT;
     inrd_port.write(rdtr);
     `uvm_info("INPUT_MONITOR", $sformatf("Read Request -> ARADDR: 0x%0h | ARPROT: 0x%0h", rdtr.ARADDR, rdtr.ARPROT), UVM_NONE)
   end

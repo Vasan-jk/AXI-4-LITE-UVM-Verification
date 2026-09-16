@@ -12,39 +12,54 @@ class axi_subscriber extends uvm_component;
   uvm_analysis_imp_outrd #(axi_seq_item, axi_subscriber) ap_outrd;
 
 
-  axi_seq_item tr;
+  axi_seq_item rdintr;
+  axi_seq_item wrintr;
+  axi_seq_item rdouttr;
+  axi_seq_item wrouttr;
 
   covergroup cg_write;
     option.per_instance = 1;
 
-    awaddr_cp: coverpoint tr.AWADDR {
-      bins b1 = {[32'h00000000 : 32'h00000024]};
-      bins b2 = {[32'h00000028 : 32'h00000030]};
-      bins b3 = {[32'h00000034 : 32'h00000038]};
-      bins b4 = {32'h0000003C};
+    awaddr_cp: coverpoint wrintr.AWADDR {
+      bins read_write = {[32'h00 : 32'h24]};
+      bins read_only = {[32'h28 : 32'h30]};
+      bins write_only = {[32'h34 : 32'h38]};
+      bins boundry_rw = {32'h3C};
       bins others = default;
     }
 
-    wdata_cp: coverpoint tr.WDATA {
+    wdata_cp: coverpoint wrintr.WDATA {
       bins low  = {[32'h0000_0000 : 32'h5555_5555]};
       bins mid  = {[32'h5555_5556 : 32'hAAAA_AAAA]};
       bins high = {[32'hAAAA_AAAB : 32'hFFFF_FFFF]};
     }
 
-    wstrb_cp: coverpoint tr.WSTRB {
-      bins b2[] = {[4'b0000 : 4'b1111]};
+    wstrb_cp: coverpoint wrintr.WSTRB {
+      bins all_bytes   = {4'b1111};
+      bins no_bytes    = {4'b0000};
+      bins single_byte = {4'b0001, 4'b0010, 4'b0100, 4'b1000};
+      bins partial     = default;
+    }
+    cp_bresp : coverpoint wrintr.BRESP {
+      bins OKAY   = {2'b00};
+      bins SLVERR = {2'b10};
+      bins DECERR = {2'b11};
+      illegal_bins EXOKAY = {2'b01};
     }
   endgroup
 
   covergroup cg_read;
     option.per_instance = 1;
 
-    araddr_cp: coverpoint tr.ARADDR {
-      bins b1 = {[32'h00000000 : 32'h00000024]};
-      bins b2 = {[32'h00000028 : 32'h00000030]};
-      bins b3 = {[32'h00000034 : 32'h00000038]};
-      bins b4 = {32'h0000003C};
-      bins others = default;
+    araddr_cp: coverpoint rdintr.ARADDR {
+      bins low    = {[32'h0 : 32'h0C]};
+      bins mid    = {[32'h10 : 32'h38]};
+      bins last   = {32'h3C};
+      bins out   = {[32'h40 : $]};
+      bins unaligned= {[32'h0 : 32'h3B]} with (item % 4 != 0);
+    }
+    cp_arprot : coverpoint rdintr.ARPROT {
+      bins all_prots[] = {[0:7]};
     }
   endgroup
 
@@ -59,22 +74,22 @@ class axi_subscriber extends uvm_component;
   endfunction
 
   function void write_inwr(axi_seq_item t);
-    tr = t;
+    wrintr = t;
     cg_write.sample();
   endfunction
 
   function void write_inrd(axi_seq_item t);
-    tr = t;
+    rdintr = t;
     cg_read.sample();
   endfunction
 
   function void write_outwr(axi_seq_item t);
-    tr = t;
+    wrouttr = t;
     cg_write.sample();
   endfunction
 
   function void write_outrd(axi_seq_item t);
-    tr = t;
+    rdouttr = t;
     cg_read.sample();
   endfunction
 
