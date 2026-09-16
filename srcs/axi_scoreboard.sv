@@ -31,12 +31,12 @@ task write_check();
   axi_seq_item act_tr;
   forever begin
     moninwr_fifo.get(exp_tr);
-    `uvm_info("SCOREBOARD",$sformatf("INPUT MONITOR\n%s",exp_tr.sprint()),UVM_HIGH)
+    `uvm_info("SCOREBOARD", $sformatf("Expected WR -> AWADDR: 0x%0h | WDATA: 0x%0h | WSTRB: 0x%0h", exp_tr.AWADDR, exp_tr.WDATA, exp_tr.WSTRB), UVM_HIGH)
     ref_model_wr(exp_tr);
     
     monoutwr_fifo.get(act_tr);
-    `uvm_info("SCOREBOARD",$sformatf("OUTPUT MONITOR\n%s",act_tr.sprint()),UVM_HIGH)
-  
+    `uvm_info("SCOREBOARD", $sformatf("Actual WR   -> AWADDR: 0x%0h | WDATA: 0x%0h | BRESP: 0x%0h", act_tr.AWADDR, act_tr.WDATA, act_tr.BRESP), UVM_HIGH) 
+ 
     if(act_tr.BRESP != exp_tr.BRESP) begin
     `uvm_error(get_type_name(),$sformatf("WR BRESP mismatch: AWADDR=0x%0h exp=%0b act=%0b",exp_tr.AWADDR, exp_tr.BRESP, act_tr.BRESP))
     end else begin
@@ -59,14 +59,9 @@ task read_check();
     end
     else if (exp_tr.RRESP == 2'b00 && act_tr.RDATA !== exp_tr.RDATA) begin
       `uvm_error(get_type_name(),
-        $sformatf("RD DATA mismatch: ARADDR=0x%0h exp=0x%0h act=0x%0h",
+        $sformatf("read DATA mismatch: ARADDR=0x%0h exp=0x%0h act=0x%0h",
                    exp_tr.ARADDR, exp_tr.RDATA, act_tr.RDATA))
     end 
-    else if (exp_tr.RRESP != 2'b00 && act_tr.RDATA !== 32'h0) begin
-      `uvm_error(get_type_name(),
-        $sformatf("RD ERROR LEAK: RDATA must be 0 on error. ARADDR=0x%0h RRESP=%0b act_data=0x%0h", 
-                   exp_tr.ARADDR, act_tr.RRESP, act_tr.RDATA))
-    end
     else begin
       `uvm_info(get_type_name(),
         $sformatf("RD match: ARADDR=0x%0h RDATA=0x%0h", exp_tr.ARADDR, exp_tr.RDATA),

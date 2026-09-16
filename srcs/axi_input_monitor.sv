@@ -52,7 +52,7 @@ join
 
 if(aw_done && w_done) begin
   inwr_port.write(wrtr);
-  `uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR[WRITE TRANSACTION]\n%s",wrtr.sprint()),UVM_NONE)
+  `uvm_info("INPUT_MONITOR", $sformatf("Write Request -> AWADDR: 0x%0h | AWPROT: 0x%0h | WDATA: 0x%0h | WSTRB: 0x%0h", wrtr.AWADDR, wrtr.AWPROT, wrtr.WDATA, wrtr.WSTRB), UVM_NONE)
   wrtr = axi_seq_item::type_id::create("wrtr");
   aw_done = 0;
   w_done  = 0;
@@ -63,7 +63,7 @@ end
     rdtr.ARVALID = vif.monin_cb.ARVALID;
     rdtr.ARREADY = vif.monin_cb.ARREADY;
     inrd_port.write(rdtr);
-  `uvm_info("INPUT_MONITOR",$sformatf("Input MONITOR[READ TRANSACTION]\n%s",wrtr.sprint()),UVM_NONE)
+    `uvm_info("INPUT_MONITOR", $sformatf("Read Request -> ARADDR: 0x%0h | ARPROT: 0x%0h", rdtr.ARADDR, rdtr.ARPROT), UVM_NONE)
   end
 end
 endtask

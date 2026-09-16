@@ -34,16 +34,16 @@ rdtr = axi_seq_item::type_id::create("rdtr");
   wrtr.BRESP = vif.monout_cb.BRESP; 
   outwr_port.write(wrtr);
   $display("OUTMON WRITE TRANSACTION SENT TO SCB"); 
-  `uvm_info("OUTPUT_MONITOR",$sformatf("Output MONITOR\n%s",wrtr.sprint()),UVM_HIGH)
- end
+  `uvm_info("OUTPUT_MONITOR", $sformatf("Write Response -> AWADDR: 0x%0h | WDATA: 0x%0h | BRESP: 0x%0h", wrtr.AWADDR, wrtr.WDATA, wrtr.BRESP), UVM_HIGH) 
+end
  
  if(vif.monout_cb.RVALID && vif.monout_cb.RREADY) begin
   rdtr.RDATA = vif.monout_cb.RDATA; 
   rdtr.RRESP = vif.monout_cb.RRESP; 
   outrd_port.write(rdtr); 
   $display("OUTMON READ TRANSACTION SENT TO SCB"); 
-  `uvm_info("OUTPUT_MONITOR",$sformatf("Output MONITOR\n%s",rdtr.sprint()),UVM_HIGH)
- end
+  `uvm_info("OUTPUT_MONITOR", $sformatf("Read Response  -> ARADDR: 0x%0h | RDATA: 0x%0h | RRESP: 0x%0h", rdtr.ARADDR, rdtr.RDATA, rdtr.RRESP), UVM_HIGH) 
+end
 end
 endtask
 endclass
