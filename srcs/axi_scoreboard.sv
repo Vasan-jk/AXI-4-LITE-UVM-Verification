@@ -78,6 +78,7 @@ task ref_model_wr(axi_seq_item tr);
      else if(tr.AWADDR >= 32'h28 && tr.AWADDR <= 32'h30)
         tr.BRESP = 2'b10;
      else begin
+        tr.BRESP = 2'b00;
         for(int i = 0; i < 4; i++) begin
            if(tr.WSTRB[i])  
             mem[tr.AWADDR][i*8 +:8] = tr.WDATA[i*8 +:8];
@@ -92,7 +93,9 @@ task ref_model_rd(axi_seq_item tr);
         tr.RRESP = 2'b10;
      else if(tr.ARADDR >= 32'h34 && tr.ARADDR <= 32'h38)
         tr.RRESP = 2'b10;
-     else
+     else begin
+        tr.RRESP = 2'b00;
         tr.RDATA = mem[tr.ARADDR];
+     end
 endtask
 endclass

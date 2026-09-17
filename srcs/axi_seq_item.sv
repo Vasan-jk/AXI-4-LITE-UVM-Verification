@@ -53,7 +53,7 @@ function new(string name = "axi_seq_item");
 endfunction
 
 constraint rand_cycle{
-    soft wt_addr == 0;
+    soft wt_addr ==0;
     soft wt_data == 1;
 }
 endclass

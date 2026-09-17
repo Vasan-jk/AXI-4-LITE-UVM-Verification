@@ -39,10 +39,12 @@ forever begin
   seq_item_port.get_next_item(trw);
   fork
     begin
+      `uvm_info("DRV_cycles",$sformatf("trw.wt_addr=%d",trw.wt_addr),UVM_MEDIUM)
       repeat(trw.wt_addr) @(vif.drv_cb);
       wr_addr(trw);
     end
     begin
+      `uvm_info("DRV_cycles",$sformatf("trw.wt_data=%d",trw.wt_data),UVM_MEDIUM)
       repeat(trw.wt_data) @(vif.drv_cb);
       wr_data(trw);
     end
@@ -57,7 +59,7 @@ endtask
 task read_op();
   forever begin
     rep.get_next_item(trr);
-    //repeat(trr.wt_addr) @(vif.drv_cb);
+   // repeat(trr.wt_addr) @(vif.drv_cb);
     rd_addr(trr);
     rd_data(trr);
     rep.item_done();
@@ -66,23 +68,27 @@ endtask
 
 task wr_addr(axi_seq_item wrar);
 if(wrar.AWVALID) begin
+      `uvm_info("DRV",$sformatf("sending addr"),UVM_MEDIUM)
   vif.drv_cb.AWADDR <= wrar.AWADDR;
   vif.drv_cb.AWVALID <= wrar.AWVALID;
   vif.drv_cb.AWPROT <= wrar.AWPROT;
   do
    @(vif.drv_cb); 
   while(!vif.drv_cb.AWREADY);
+      `uvm_info("DRV",$sformatf("aw handshake done"),UVM_MEDIUM)
     vif.drv_cb.AWVALID <= 0;
 end
 endtask
 task wr_data(axi_seq_item wrdt);
 if(wrdt.WVALID) begin
+      `uvm_info("DRV",$sformatf("sending wdata"),UVM_MEDIUM)
   vif.drv_cb.WDATA <= wrdt.WDATA;
   vif.drv_cb.WSTRB <= wrdt.WSTRB;
   vif.drv_cb.WVALID <= wrdt.WVALID;
   do
    @(vif.drv_cb); 
   while(!vif.drv_cb.WREADY);
+      `uvm_info("DRV",$sformatf("w handshake done"),UVM_MEDIUM)
     vif.drv_cb.WVALID <= 0;
 end
 endtask

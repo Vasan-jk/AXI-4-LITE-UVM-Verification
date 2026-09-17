@@ -64,7 +64,7 @@ task body();
   repeat(`num_of_transaction) begin
   req = axi_seq_item::type_id::create("req");
     start_item(req);
-    assert(req.randomize() with {AWADDR % 4 == 0; AWADDR inside{[0:32'h27],32'h3C}; AWVALID == 1; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
+    assert(req.randomize() with {wt_addr==2;wt_data==0;AWADDR % 4 == 0; AWADDR inside{[0:32'h27],32'h3C}; AWVALID == 1; WVALID == 1; BREADY == 1; ARVALID == 0; RREADY == 0; }  );
     finish_item(req);
   end
 endtask
@@ -81,7 +81,7 @@ task body();
   repeat(`num_of_transaction) begin
   req = axi_seq_item::type_id::create("req");
     start_item(req);
-    assert(req.randomize() with {AWVALID == 0; WVALID == 0; ARVALID == 1; ARADDR[1:0] == 2'b00; ARADDR inside{[0:32'h27],32'h3C}; RREADY == 1; ARPROT inside {[0:7]}; }  );
+    assert(req.randomize() with {AWVALID == 0; WVALID == 0; BREADY==0; ARVALID == 1; ARADDR[1:0] == 2'b00; ARADDR inside{[0:32'h27],32'h3C}; RREADY == 1; ARPROT inside {[0:7]}; }  );
     finish_item(req);
   end
 endtask
